@@ -1,8 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Collections.Generic;
+using Codeer.Friendly.Dynamic;
 using Codeer.Friendly.Windows;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using Codeer.Friendly;
 
 namespace Sample
 {
@@ -10,13 +14,79 @@ namespace Sample
     public class Test
     {
         WindowsAppFriend _app;
-
+    
         [TestInitialize]
-        void TestInitialize()
+        public void TestInitialize()
         {
             //attach to target process!
             var path = Path.GetFullPath("../../../Target/bin/Debug/Target.exe");
             _app = new WindowsAppFriend(Process.Start(path));
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Process process = Process.GetProcessById(_app.ProcessId);
+            _app.Dispose();
+            process.CloseMainWindow();
+        }
+
+        [TestMethod]
+        public void Manipulate()
+        {
+            //static method
+            //PresentationFramework.dll need add otherwise Application can't use
+            dynamic window = _app.Type<Application>().Current.MainWindow;
+
+            //instance method
+            string value = window.MyFunc(5);
+            Assert.AreEqual("5", value);
+
+            //instance property
+            window.DataContext.TextData = "abc";
+
+            //instance field
+            string text = window._textBox.Text;
+            Assert.AreEqual("abc",text);
+
+            //new instance in target process
+            var addText = _app.Type<TextBox>()();
+            //reference to target process
+            window.Content.Children.Add(addText);
+        }
+
+        [TestMethod]
+        public void AsyncTest()
+        {
+            dynamic window = _app.Type<Application>().Current.MainWindow;
+
+            var async = new Async();
+            var text = window.MyFunc(async, 5);
+
+            //you can check whether it has completed.
+            if (async.IsCompleted)
+            {  
+            }
+
+            // When the operation finishes, the value will be available.
+            async.WaitForCompletion();
+            string textValue = (string) text;
+            Assert.Equals("5", textValue);
+        }
+
+        [TestMethod]
+        public void CopyTest()
+        {
+            Dictionary<int, string> dic = new Dictionary<int, string>();
+            dic.Add(1, "1");
+
+            // Object is serialized and a copy will be sent to the target process 
+            dynamic dicInTarget = _app.Copy(dic);
+
+            // Null is useful for out arguments
+            dynamic value = _app.Null();
+            dicInTarget.TryGetValue(1, value);
+            Assert.AreEqual("1", (string)value);
         }
     }
 }
