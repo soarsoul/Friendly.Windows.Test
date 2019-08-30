@@ -40,13 +40,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Codeer.Friendly">
-      <HintPath>..\..\..\..\Friendly.Windows-master\Project\Test\Test\packages\Codeer.Friendly.2.6.1\lib\net40\Codeer.Friendly.dll</HintPath>
+      <HintPath>..\packages\Codeer.Friendly.2.6.1\lib\net40\Codeer.Friendly.dll</HintPath>
     </Reference>
     <Reference Include="Codeer.Friendly.Dynamic">
-      <HintPath>..\..\..\..\Friendly.Windows-master\Project\Test\Test\packages\Codeer.Friendly.2.6.1\lib\net40\Codeer.Friendly.Dynamic.dll</HintPath>
+      <HintPath>..\packages\Codeer.Friendly.2.6.1\lib\net40\Codeer.Friendly.Dynamic.dll</HintPath>
     </Reference>
     <Reference Include="Codeer.Friendly.Windows">
-      <HintPath>..\..\..\..\Friendly.Windows-master\Project\Test\Test\packages\Codeer.Friendly.Windows.2.15.0\lib\net20\Codeer.Friendly.Windows.dll</HintPath>
+      <HintPath>..\packages\Codeer.Friendly.Windows.2.15.0\lib\net20\Codeer.Friendly.Windows.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
