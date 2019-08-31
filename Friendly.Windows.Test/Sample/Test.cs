@@ -88,5 +88,58 @@ namespace Sample
             dicInTarget.TryGetValue(1, value);
             Assert.AreEqual("1", (string)value);
         }
+
+        [TestMethod]
+        public void CastBehaviorTest()
+        {
+            dynamic window = _app.Type<Application>().Current.MainWindow;
+
+            // referenced object exists in target process' memory.
+            dynamic reference = window._textBox.Text;
+
+            // when you perform a cast, it will marshaled from the target process.
+            string text = reference;
+
+            // ok
+            string cast = (string)reference;
+
+            // No good. Result is false
+            bool isString = reference is string;
+
+            // No good. Result is null
+            string textAs = reference as string;
+
+            // ok
+            string.IsNullOrEmpty((string)reference);
+
+            // No good. Throws an exception
+            string.IsNullOrEmpty(reference);
+        }
+
+        [TestMethod]
+        public void DllInjectionTest()
+        {
+            dynamic window = _app.Type<Application>().Current.MainWindow;
+            dynamic textBox = window._textBox;
+
+            //The code let target process load current assembly.
+            WindowsAppExpander.LoadAssembly(_app, GetType().Assembly);
+
+            //You can use class defined in current assembly
+            dynamic observer = _app.Type<Observer>()(textBox);
+
+            //Check change text
+            textBox.Text = "abc";
+            Assert.IsTrue((bool)observer.TextChanged);
+        }
+    }
+
+    class Observer
+    {
+        internal bool TextChanged { get; set; }
+        internal Observer(TextBox textBox)
+        {
+            textBox.TextChanged += delegate { TextChanged = true; };
+        }
     }
 }
